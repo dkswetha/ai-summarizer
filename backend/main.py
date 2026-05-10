@@ -21,9 +21,6 @@ app.add_middleware(
 def health():
     return {"status": "ok"}
 
-@app.get("/")
-def root():
-    return {"message": "Summarizer API is running!"}
 
 @app.post("/summarize/text")
 async def summarize_from_text(text: str = Form(...)):
