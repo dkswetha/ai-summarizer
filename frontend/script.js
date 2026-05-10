@@ -1,4 +1,4 @@
-const API = "https://ai-summarizer-zkj2.onrender.com/";
+const API = "";
 
 function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
