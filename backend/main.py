@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from summarizer import summarize_text
+from backend.summarizer import summarize_text
 from pypdf import PdfReader
 import io
 import os
