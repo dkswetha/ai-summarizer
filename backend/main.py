@@ -1,7 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from backend.summarizer import summarize_text
 from pypdf import PdfReader
 import io
@@ -16,11 +15,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Render detects this immediately — confirms port is open
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+@app.get("/api")
+def root():
+    return {"message": "Summarizer API is running!"}
 
 @app.post("/summarize/text")
 async def summarize_from_text(text: str = Form(...)):
@@ -40,10 +41,6 @@ async def summarize_from_pdf(file: UploadFile = File(...)):
     return {"summary": summary}
 
 # Serve frontend
-import os
 frontend_path = os.path.join(os.path.dirname(__file__), "../frontend")
-print("CURRENT FILE:", __file__)
-print("FRONTEND PATH:", frontend_path)
-print("FRONTEND EXISTS:", os.path.exists(frontend_path))
 if os.path.exists(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
