@@ -3,7 +3,7 @@ import requests
 import time
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
+API_URL = "https://api-inference.huggingface.co/models/sshleifer/distilbart-cnn-12-6"
 
 def summarize_text(text: str) -> str:
     text = text.strip()
@@ -16,47 +16,46 @@ def summarize_text(text: str) -> str:
 
     summaries = []
     for chunk in chunks:
-        # Retry up to 3 times (model may be loading)
-        for attempt in range(3):
-            response = requests.post(
-                API_URL,
-                headers={"Authorization": f"Bearer {HF_TOKEN}"},
-                json={
-                    "inputs": chunk,
-                    "parameters": {
-                        "max_length": 300,
-                        "min_length": 100,
-                        "do_sample": False
-                    }
-                },
-                timeout=60
-            )
-
-            # Empty response — model loading, wait and retry
-            if response.status_code == 503 or len(response.text.strip()) == 0:
-                time.sleep(10)
-                continue
-
-            # Parse response safely
+        for attempt in range(5):  # retry up to 5 times
             try:
+                response = requests.post(
+                    API_URL,
+                    headers={"Authorization": f"Bearer {HF_TOKEN}"},
+                    json={
+                        "inputs": chunk,
+                        "parameters": {
+                            "max_length": 300,
+                            "min_length": 80,
+                            "do_sample": False
+                        },
+                        "options": {
+                            "wait_for_model": True  # tells HF to wait until model is ready
+                        }
+                    },
+                    timeout=120  # wait up to 2 minutes
+                )
+
+                # Empty response
+                if len(response.text.strip()) == 0:
+                    time.sleep(10)
+                    continue
+
                 result = response.json()
-            except Exception:
+
+                # Still loading
+                if isinstance(result, dict) and "error" in result:
+                    time.sleep(20)
+                    continue
+
+                # Success
+                if isinstance(result, list) and len(result) > 0:
+                    summaries.append(result[0]['summary_text'])
+                    break
+
+            except Exception as e:
                 time.sleep(10)
                 continue
-
-            # HuggingFace returns loading error as dict
-            if isinstance(result, dict) and "error" in result:
-                if "loading" in result["error"].lower():
-                    time.sleep(15)
-                    continue
-                return f"API Error: {result['error']}"
-
-            # Success
-            if isinstance(result, list) and len(result) > 0:
-                summaries.append(result[0]['summary_text'])
-                break
-
         else:
-            return "Model is still loading on HuggingFace servers. Please try again in 30 seconds."
+            summaries.append("[Could not summarize this section]")
 
     return " ".join(summaries)
