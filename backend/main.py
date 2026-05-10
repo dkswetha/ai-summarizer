@@ -32,5 +32,6 @@ async def summarize_from_pdf(file: UploadFile = File(...)):
     summary = summarize_text(full_text)
     return {"summary": summary}
 
-# Serve frontend files — add this at the very end
-app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
+# Works both locally and on Render
+frontend_path = os.path.join(os.path.dirname(__file__), "../frontend")
+app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
