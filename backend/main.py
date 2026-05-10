@@ -43,6 +43,7 @@ async def summarize_from_pdf(file: UploadFile = File(...)):
     return {"summary": summary}
 
 # Serve frontend
+import os
 frontend_path = os.path.join(os.path.dirname(__file__), "../frontend")
 if os.path.exists(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
