@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Summarizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Text Summarizer</h1>
+        <p class="subtitle">Paste text or upload a PDF to get a quick summary</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('text')">Paste Text</button>
+            <button class="tab" onclick="switchTab('pdf')">Upload PDF</button>
+        </div>
+
+        <div id="text-section">
+            <textarea id="textInput" placeholder="Paste your long text here..."></textarea>
+            <button onclick="summarizeText()">Summarize Text</button>
+        </div>
+
+        <div id="pdf-section" style="display:none;">
+            <input type="file" id="pdfInput" accept=".pdf">
+            <button onclick="summarizePDF()">Summarize PDF</button>
+        </div>
+
+        <div id="output-box" style="display:none;">
+            <h3>Summary:</h3>
+            <div id="loading" style="display:none;">Generating summary, please wait...</div>
+            <p id="summaryText"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
