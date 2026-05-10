@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from summarizer import summarize_text
 from pypdf import PdfReader
 import io
+import os
 
 app = FastAPI()
 
@@ -14,6 +15,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Render detects this immediately — confirms port is open
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.get("/")
+def root():
+    return {"message": "Summarizer API is running!"}
 
 @app.post("/summarize/text")
 async def summarize_from_text(text: str = Form(...)):
@@ -32,6 +42,7 @@ async def summarize_from_pdf(file: UploadFile = File(...)):
     summary = summarize_text(full_text)
     return {"summary": summary}
 
-# Works both locally and on Render
+# Serve frontend
 frontend_path = os.path.join(os.path.dirname(__file__), "../frontend")
-app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
