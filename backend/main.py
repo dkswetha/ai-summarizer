@@ -25,8 +25,11 @@ def root():
 
 @app.post("/summarize/text")
 async def summarize_from_text(text: str = Form(...)):
-    summary = summarize_text(text)
-    return {"summary": summary}
+    try:
+        summary = summarize_text(text)
+        return {"summary": summary}
+    except Exception as e:
+        return {"error": str(e), "detail": "summarizer failed"}
 
 @app.post("/summarize/pdf")
 async def summarize_from_pdf(file: UploadFile = File(...)):
