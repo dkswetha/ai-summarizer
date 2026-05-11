@@ -43,6 +43,25 @@ async def summarize_from_pdf(file: UploadFile = File(...)):
     summary = summarize_text(full_text)
     return {"summary": summary}
 
+@app.get("/debug")
+async def debug():
+    import requests, os
+    HF_TOKEN = os.environ.get("HF_TOKEN", "")
+    response = requests.post(
+        "https://api-inference.huggingface.co/models/sshleifer/distilbart-cnn-12-6",
+        headers={"Authorization": f"Bearer {HF_TOKEN}"},
+        json={
+            "inputs": "The quick brown fox jumps over the lazy dog. This is a test sentence to check if the model is working correctly and returning a proper summary.",
+            "options": {"wait_for_model": True}
+        },
+        timeout=120
+    )
+    return {
+        "status_code": response.status_code,
+        "response_text": response.text[:500],
+        "token_set": bool(HF_TOKEN)
+    }
+
 # Serve frontend
 frontend_path = os.path.join(os.path.dirname(__file__), "../frontend")
 if os.path.exists(frontend_path):
