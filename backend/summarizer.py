@@ -2,10 +2,11 @@ import os
 import requests
 import time
 
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
-API_URL = "https://api-inference.huggingface.co/models/sshleifer/distilbart-cnn-12-6"
+API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
 
 def summarize_text(text: str) -> str:
+    HF_TOKEN = os.environ.get("HF_TOKEN", "")  # read token fresh every call
+
     text = text.strip()
     if len(text.split()) < 30:
         return "Text is too short to summarize!"
@@ -16,7 +17,7 @@ def summarize_text(text: str) -> str:
 
     summaries = []
     for chunk in chunks:
-        for attempt in range(5):  # retry up to 5 times
+        for attempt in range(5):
             try:
                 response = requests.post(
                     API_URL,
@@ -29,25 +30,22 @@ def summarize_text(text: str) -> str:
                             "do_sample": False
                         },
                         "options": {
-                            "wait_for_model": True  # tells HF to wait until model is ready
+                            "wait_for_model": True
                         }
                     },
-                    timeout=120  # wait up to 2 minutes
+                    timeout=120
                 )
 
-                # Empty response
                 if len(response.text.strip()) == 0:
                     time.sleep(10)
                     continue
 
                 result = response.json()
 
-                # Still loading
                 if isinstance(result, dict) and "error" in result:
                     time.sleep(20)
                     continue
 
-                # Success
                 if isinstance(result, list) and len(result) > 0:
                     summaries.append(result[0]['summary_text'])
                     break
