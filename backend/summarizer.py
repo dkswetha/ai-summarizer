@@ -2,10 +2,11 @@ import os
 import requests
 import time
 
-API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
-
 def summarize_text(text: str) -> str:
-    HF_TOKEN = os.environ.get("HF_TOKEN", "")  # read token fresh every call
+    HF_TOKEN = os.environ.get("HF_TOKEN", "")
+    
+    # New HuggingFace Inference API URL format
+    API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn"
 
     text = text.strip()
     if len(text.split()) < 30:
@@ -21,7 +22,10 @@ def summarize_text(text: str) -> str:
             try:
                 response = requests.post(
                     API_URL,
-                    headers={"Authorization": f"Bearer {HF_TOKEN}"},
+                    headers={
+                        "Authorization": f"Bearer {HF_TOKEN}",
+                        "Content-Type": "application/json"
+                    },
                     json={
                         "inputs": chunk,
                         "parameters": {
