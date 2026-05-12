@@ -78,8 +78,25 @@ button {
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.2s;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 button:hover { background: #5a67d8; }
+
+.tab {
+    padding: 10px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    color: #4a5568;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.tab.active { background: #667eea; color: white; border-color: #667eea; }
+.tab:hover { background: #edf2f7; }
 
 #output-box {
     margin-top: 30px;
