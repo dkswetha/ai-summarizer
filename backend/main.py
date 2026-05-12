@@ -30,10 +30,13 @@ async def debug():
     HF_TOKEN = os.environ.get("HF_TOKEN", "")
     try:
         response = requests.post(
-            "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
-            headers={"Authorization": f"Bearer {HF_TOKEN}"},
+            "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn",
+            headers={
+                "Authorization": f"Bearer {HF_TOKEN}",
+                "Content-Type": "application/json"
+            },
             json={
-                "inputs": "The sun is a star at the center of our solar system. It provides energy for life on Earth.",
+                "inputs": "The sun is a star at the center of our solar system. It provides energy for life on Earth through light and heat. Without the sun life would not exist on our planet.",
                 "options": {"wait_for_model": True}
             },
             timeout=120
